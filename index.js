@@ -1,38 +1,54 @@
 /*
- * Primary file for API
+ * Title: Basic Node Example
+ * Description: Simple file that declares a few functions and invokes them.
+ * Author: Leslie Lewis
+ * Date: 10/24/17
  *
  */
 
-// Dependencies
-var server = require('./lib/server');
-var workers = require('./lib/workers');
-var cli = require('./lib/cli');
 
-// Declare the app
+// Dependencies
+var mathLib = require('./lib/math');
+var jokesLib = require('./lib/jokes');
+
+
+// App object
 var app = {};
 
-// Init function
-app.init = function(callback){
 
-  // Start the server
-  server.init();
-
-  // Start the workers
-  workers.init();
-
-  // Start the CLI, but make sure it starts last
-  setTimeout(function(){
-    cli.init();
-    callback();
-  },50);
-
+// Configuration
+app.config = {
+    'timeBetweenJokes' : 1000
 };
 
-// Self invoking only if required directly
-if(require.main === module){
-  app.init(function(){});
-}
+
+// Function that prints a random joke
+app.printAJoke = function(){
+
+    // Get all the jokes
+    var allJokes = jokesLib.allJokes();
+
+    // Get the length of the jokes
+    var numberOfJokes = allJokes.length;
+
+    // Pick a random number between 1 and the number of jokes
+    var randomNumber = mathLib.getRandomNumber(1,numberOfJokes);
+
+    // Get the joke at that position in the array (minus one)
+    var selectedJoke = allJokes[randomNumber - 1];
+
+    // Send the joke to the console
+    console.log(selectedJoke);
+};
 
 
-// Export the app
-module.exports = app;
+// Function that loops indefinitely, calling the printAJoke function as it goes
+app.indefiniteLoop = function(){
+
+    // Create the interval, using the config variable defined above
+    setInterval(app.printAJoke,app.config.timeBetweenJokes);
+};
+
+
+// Invoke the loop
+app.indefiniteLoop();
